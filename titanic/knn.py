@@ -1,18 +1,18 @@
-import math
 from collections import namedtuple
 from typing import List
 
-train_data: list = []
+import numpy as np
+
+train_data: List[List[float]] = []
 Neighbor = namedtuple('Neighbor', 'nclass distance')
 
 
-def _euclidean_distance(instance1: list, instance2: list) -> float:
+def _euclidean_distance(instance1: List[float], instance2: List[float]) -> float:
     if not len(instance1) == len(instance2):
         raise Exception('Exception euclid')
-    distance: float = 0
-    for x in range(0, len(instance1)):
-        distance += pow((instance1[x] - instance2[x]), 2)
-    return math.sqrt(distance)
+    x = np.array(instance1)
+    y = np.array(instance2)
+    return np.linalg.norm(x - y)
 
 
 def clear() -> None:
@@ -20,12 +20,12 @@ def clear() -> None:
     train_data = []
 
 
-def fit(*data: List[list]):
+def fit(*data: List[List[float]]):
     global train_data
     train_data.extend(data)
 
 
-def predict(instance: list, k: int = 1) -> int:
+def predict(instance: List[float], k: int = 1) -> int:
     global train_data
     neighbor_list = _get_neighbor_list(instance, train_data)
     sorted_distances = sorted(neighbor_list, key=lambda x: x.distance)
@@ -34,12 +34,11 @@ def predict(instance: list, k: int = 1) -> int:
     for i in k_neighbors:
         n = class_dict.setdefault(i.nclass, 0)
         class_dict[i.nclass] = n + 1
-        # print('Distance: %f - Class: %i' % (i.distance, i.nclass))
     return max(class_dict, key=class_dict.get)
 
 
-def _get_neighbor_list(instance, train_data) -> list:
-    distances: list = []
+def _get_neighbor_list(instance, train_data) -> List[Neighbor]:
+    distances: List[Neighbor] = []
     for n_class in range(0, len(train_data)):
         for i in train_data[n_class]:
             neighbor = Neighbor(nclass=n_class, distance=_euclidean_distance(instance, i))
