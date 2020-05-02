@@ -48,14 +48,14 @@ def run() -> None:
 
     test_df = get_test_data()
     results = []
-    img_id: int = 0
 
-    for test_list in test_df.values:
+    for key in range(0, len(test_df.values)):
+        test_list = test_df.values[key]
+        img_id = key + 1
         start = timer()
-        img_id += 1
         results.append([img_id, knn.predict(np.array(test_list))])
         end = timer()
-        print('Done ' + str(img_id) + ' in ' + str(end - start) + 's')
+        print('Done ' + str(img_id) + ' in ' + str((end - start)) + 's')
 
     write_to_csv(results)
 
